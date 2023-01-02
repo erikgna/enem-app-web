@@ -3,13 +3,14 @@ import { QuestionContext } from '../../context/Question'
 import { useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query';
 import { getOne, getOneRandomQuestion } from '../../api';
+import { IQuestion } from '../../interface/Question';
 
 interface IQuestionPage {
     result?: boolean;
 }
 
-export const Question = ({ result }: IQuestionPage) => {
-    const { saveResult, getRandomQuestion } = useContext(QuestionContext)
+export const Question = () => {
+    const { question, saveResult, getRandomQuestion } = useContext(QuestionContext)
     const location = useLocation()
 
     const url = location.pathname.split('-')
@@ -18,45 +19,51 @@ export const Question = ({ result }: IQuestionPage) => {
     const [answer, setAnswer] = useState<string | undefined>(undefined)
     const [open, setOpen] = useState<boolean>(false)
 
-    const query = useQuery({
+    let query;
+    if (!question) query = useQuery({
         queryKey: ['question'],
         refetchOnWindowFocus: false,
-        queryFn: () => getOne(`${url[1]}-${url[2]}-${url[3]}`)
+        queryFn: () => getOne(`${url[0].replace('/question/', '')}-${url[1]}-${url[2]}`)
     })
 
-    if (query.isLoading) {
-        return <h1>Loading...</h1>
-    }
+    const questionTemp = query ? query.data?.data as IQuestion : question
 
-
-    const question = query.data?.data
-
-    const finalAnswer = () => {
+    const finalAnswer = async () => {
         if (!choose) {
             setOpen(true)
             return
         }
 
-        const rightAnswer = question?.rightAnswer?.toLowerCase()
-        console.log(rightAnswer)
+        const rightAnswer = questionTemp?.rightAnswer?.toLowerCase()
         setAnswer(rightAnswer)
-        // saveResult(rightAnswer !== choose)
+
+        if (questionTemp) {
+            await saveResult({ id: questionTemp?.id, correct: choose === questionTemp.rightAnswer })
+        }
     }
 
     const nextPage = async () => {
         await getRandomQuestion();
+
+        window.location.reload()
     }
+
+    useEffect(() => {
+        if (url.length === 4) {
+            setAnswer(url[3])
+        }
+    }, [])
 
     return (
         <div className='flex flex-col px-2 dark:bg-gray-900 dark:text-white pt-8 min-h-screen pb-8'>
-            <h2 className='text-2xl font-bold' onClick={() => console.log(answer)}>{question?.name}</h2>
-            <div className='text-base mt-4 mb-8' dangerouslySetInnerHTML={{ __html: question?.description! }} />
+            <h2 className='text-2xl font-bold' onClick={() => console.log(answer)}>{questionTemp?.name}</h2>
+            <div className='text-base mt-4 mb-8' dangerouslySetInnerHTML={{ __html: questionTemp?.description! }} />
 
-            <p className='text-base mb-8'>{question?.ask}</p>
+            <p className='text-base mb-8'>{questionTemp?.ask}</p>
 
             <ul className="flex flex-col">
                 {['a', 'b', 'c', 'd', 'e'].map((item) => {
-                    type IQuestionKey = keyof typeof question
+                    type IQuestionKey = keyof typeof questionTemp
 
                     if (answer === undefined) {
                         return <li key={item} onClick={() => setChoose(item)} className='mb-4'>
@@ -64,7 +71,7 @@ export const Question = ({ result }: IQuestionPage) => {
                             <label className={`${choose === item ? 'dark:text-blue-500 dark:border-blue-600 text-blue-600' : 'dark:hover:text-gray-300 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400 dark:border-gray-700'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
                                 <div className="block">
                                     <div className="w-full text-lg font-semibold">{item.toUpperCase()}</div>
-                                    <div className="w-full">{question?.answers[item as IQuestionKey]}</div>
+                                    <div className="w-full">{questionTemp?.answers[item as IQuestionKey]}</div>
                                 </div>
                             </label>
                         </li>
@@ -75,7 +82,7 @@ export const Question = ({ result }: IQuestionPage) => {
                         <label className={`${answer === item ? 'dark:text-green-500 dark:border-green-600 text-green-600' : 'dark:text-red-500 dark:border-red-600 text-red-600'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
                             <div className="block">
                                 <div className="w-full text-lg font-semibold">{item.toUpperCase()}</div>
-                                <div className="w-full">{question?.answers[item as IQuestionKey]}</div>
+                                <div className="w-full">{questionTemp?.answers[item as IQuestionKey]}</div>
                             </div>
                         </label>
                     </li>

@@ -1,6 +1,9 @@
+import { useCookies } from 'react-cookie';
 import { Link } from 'react-router-dom';
 
 export const Navbar = () => {
+    const [cookies, setCookies] = useCookies()
+
     return (
         <nav className='border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-900 w-full z-20 top-0 left-0 border-b'>
             <div className='container flex items-center justify-between mx-auto'>
@@ -13,12 +16,16 @@ export const Navbar = () => {
                         <li>
                             <Link to="/" className='pl-3 pr-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'>Inicio</Link>
                         </li>
-                        <li>
-                            <Link to="/history" className='pl-3 pr-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'>Histórico</Link>
-                        </li>
-                        <li>
-                            <Link to="/login" className='pl-3 pr-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'>Acessar conta</Link>
-                        </li>
+                        {cookies['token'] &&
+                            <li>
+                                <Link to="/history" className='pl-3 pr-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'>Histórico</Link>
+                            </li>
+                        }
+                        {!cookies['token'] &&
+                            <li>
+                                <Link to="/login" className='pl-3 pr-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'>Acessar conta</Link>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

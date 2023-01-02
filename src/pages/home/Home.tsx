@@ -3,9 +3,12 @@ import { useCookies } from 'react-cookie'
 
 import { QuestionContext } from '../../context/Question'
 
-export const Home = () => {
-    const [cookies, setCookies] = useCookies()
+const areas = [{ name: 'Ciências Humanas e suas Tecnologias', cod: 'humanas' },
+{ name: 'Ciências Naturais e suas Tecnologias', cod: 'naturais' },
+{ name: 'Linguagens, Códigos e suas Tecnologias', cod: 'linguagens' },
+{ name: 'Matemática e suas Tecnologias', cod: 'matematica' }]
 
+export const Home = () => {
     const [open, setOpen] = useState<boolean>(false)
     const { getRandomQuestion, setFilters, filters } = useContext(QuestionContext)
 
@@ -16,6 +19,8 @@ export const Home = () => {
             return;
         }
         setFilters({ ...filters, years: [...filters.years, year] })
+
+        localStorage.setItem('filters', JSON.stringify({ ...filters, years: [...filters.years, year] }))
     }
 
     const addOrRemoveArea = (area: string) => {
@@ -25,6 +30,8 @@ export const Home = () => {
             return;
         }
         setFilters({ ...filters, areas: [...filters.areas, area] })
+
+        localStorage.setItem('filters', JSON.stringify({ ...filters, areas: [...filters.areas, area] }))
     }
 
     return (
@@ -35,26 +42,23 @@ export const Home = () => {
             </div>
 
             <ul className="grid gap-6 w-full md:grid-cols-2">
-                {['Ciências Humanas e suas Tecnologias',
-                    'Ciências Naturais e suas Tecnologias',
-                    'Linguagens, Códigos e suas Tecnologias',
-                    'Matemática e suas Tecnologias'].map((item) => (
-                        <li key={item} onClick={() => addOrRemoveArea(item)}>
-                            <input type="radio" id={item} className="hidden peer" />
-                            <label className={`${filters.areas.includes(item) ? 'dark:text-blue-500 dark:border-blue-600 text-blue-600' : 'dark:hover:text-gray-300 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400 dark:border-gray-700'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
-                                <div className="block">
-                                    <div className="w-full text-lg font-semibold">Primeira prova</div>
-                                    <div className="w-full">{item}</div>
-                                </div>
-                                <svg aria-hidden="true" className="ml-3 w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
-                            </label>
-                        </li>
-                    ))}
+                {areas.map((item) => (
+                    <li key={item.name} onClick={() => addOrRemoveArea(item.cod)}>
+                        <input type="radio" id={item.name} className="hidden peer" />
+                        <label className={`${filters.areas.includes(item.cod) ? 'dark:text-blue-500 dark:border-blue-600 text-blue-600' : 'dark:hover:text-gray-300 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400 dark:border-gray-700'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
+                            <div className="block">
+                                <div className="w-full text-lg font-semibold">Primeira prova</div>
+                                <div className="w-full">{item.name}</div>
+                            </div>
+                            <svg aria-hidden="true" className="ml-3 w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
+                        </label>
+                    </li>
+                ))}
             </ul>
 
             <h4 className='text-lg font-semibold pt-8 pb-4'>Selecione os anos desejados</h4>
             <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 lg:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4">
-                {[2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021].map((year) => (
+                {[2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022].map((year) => (
                     <li key={year} className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
                         <div className="flex items-center pl-3">
                             <input
@@ -81,7 +85,7 @@ export const Home = () => {
                         if (filters.areas.length === 0 || filters.years.length === 0) {
                             setOpen(true)
                         }
-                        // getQuestion()
+                        getRandomQuestion()
                     }}
                 >Gerar Perguntas</button>
                 <button

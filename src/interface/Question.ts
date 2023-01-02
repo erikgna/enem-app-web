@@ -1,4 +1,5 @@
 export interface IQuestion {
+  id: string;
   url: string;
   name: string;
   description: string;
@@ -15,4 +16,9 @@ export interface IQuestion {
 
 export interface ISessionQuestion {
   url: string;
+}
+
+export interface IAddQuestion {
+  id: string;
+  correct: boolean;
 }

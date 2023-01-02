@@ -21,7 +21,7 @@ export const Login = () => {
         try {
             const { data } = await loginRoute(creds)
 
-            setCookies('token', data['token'])
+            setCookies('token', data['token'], { maxAge: 86400 })
 
             navigate('/')
         } catch (error) {
