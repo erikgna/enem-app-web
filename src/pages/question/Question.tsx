@@ -6,6 +6,8 @@ import { getOne } from '../../api';
 import { IQuestion } from '../../interface/Question';
 
 import styles from './Question.module.scss'
+import { QueryLoading } from '../../components/QueryLoading/QueryLoading';
+import { QueryError } from '../../components/QueryError/QueryError';
 
 export const Question = () => {
     const { question, saveResult, getRandomQuestion } = useContext(QuestionContext)
@@ -52,6 +54,20 @@ export const Question = () => {
         }
     }, [])
 
+    if (!query || query.isError) {
+        return <QueryError
+            title='Erro'
+            description='Ocorreu um erro ao requisitar a questão, por favor, tente novamente.'
+            func={nextPage}
+            linkMsg='Tentar novamente'
+        />
+    }
+
+    if (query.isLoading) {
+        return <QueryLoading />
+    }
+
+    //TODO: Enviar questoes do historico
     return (
         <div className='flex flex-col px-2 dark:bg-gray-900 dark:text-white pt-8 min-h-screen pb-8'>
             <h2 className='text-2xl font-bold'>{questionTemp?.name}</h2>

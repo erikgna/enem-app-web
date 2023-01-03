@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { IFilters } from "../interface/Filter";
-import { IAddQuestion, IQuestion } from "../interface/Question";
+import { IAddQuestion } from "../interface/Question";
 import { ILogin } from "../interface/User";
 
 const api: AxiosInstance = axios.create({
@@ -17,8 +17,7 @@ export const getHistory = () => api.get("/users/questions");
 export const addQuestion = (body: IAddQuestion) =>
   api.patch("/users/new-question", body);
 
-export const removeQuestion = (questionId: string) =>
-  api.patch(`/users/remove-question/${questionId}`);
+export const eraseHistory = () => api.delete("/users/erase-history");
 
 export const loginRoute = (body: ILogin) => api.post("/auth/login", body);
 

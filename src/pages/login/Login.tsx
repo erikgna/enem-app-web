@@ -4,18 +4,20 @@ import { Navigate, useNavigate } from 'react-router'
 import { loginRoute } from '../../api'
 import { ILogin } from '../../interface/User'
 
+const defaultCreds = { email: '', password: '' }
+
 export const Login = () => {
     const [cookies, setCookies] = useCookies()
     const navigate = useNavigate()
 
-    const [creds, setCreds] = useState<ILogin>({ email: '', password: '' })
+    const [creds, setCreds] = useState<ILogin>(defaultCreds)
     const [feedback, setFeedback] = useState<string>('')
 
     const login = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         if (creds.email.length === 0 || creds.password.length === 0) {
-            return
+            return;
         }
 
         try {
@@ -24,9 +26,11 @@ export const Login = () => {
             setCookies('token', data['token'], { maxAge: 86400 })
 
             navigate('/')
+            window.location.reload()
         } catch (error) {
             setFeedback('Ocorreu um erro com seu login, tente novamente.')
         }
+        setCreds(defaultCreds)
     }
 
     return (
@@ -69,9 +73,9 @@ export const Login = () => {
 
                 <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Realizar Login</button>
             </form>
-            {feedback !== '' && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            {feedback !== '' && <div className="mt-8 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                 <span className="block sm:inline">{feedback}</span>
-                <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                <span className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={() => setFeedback('')}>
                     <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" /></svg>
                 </span>
             </div>}

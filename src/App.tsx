@@ -18,7 +18,7 @@ function App() {
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/question/random/:random/:id' element={<Question />} />
-            <Route path='/history' element={<History />} />
+            <Route path='/history' element={document.cookie.includes('token') ? <History /> : <Home />} />
             <Route path='/login' element={<Login />} />
             <Route path='/*' element={<NotFound />} />
           </Routes>

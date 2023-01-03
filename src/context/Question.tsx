@@ -1,8 +1,8 @@
-import { useState, createContext, ReactNode, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router';
+import { useState, createContext, ReactNode } from 'react'
+import { useNavigate } from 'react-router';
 import { addQuestion, getOneRandomQuestion } from '../api';
 import { IFilters } from '../interface/Filter';
-import { IAddQuestion, IQuestion, ISessionQuestion } from '../interface/Question';
+import { IAddQuestion, IQuestion } from '../interface/Question';
 
 type QuestionContextProps = {
     children: ReactNode;
