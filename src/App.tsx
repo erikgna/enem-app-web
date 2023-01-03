@@ -17,11 +17,10 @@ function App() {
         <section>
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/question/:id' element={<Question />} />
-            <Route path='/question/:id/:result' element={<Question result={true} />} />
+            <Route path='/question/random/:random/:id' element={<Question />} />
             <Route path='/history' element={<History />} />
             <Route path='/login' element={<Login />} />
-            {/* <Route path='/*' element={<NotFound />} /> */}
+            <Route path='/*' element={<NotFound />} />
           </Routes>
         </section>
       </QuestionContextCmpnt>

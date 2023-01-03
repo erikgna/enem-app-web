@@ -1,11 +1,8 @@
-.RightQuestion {
-  background: green;
-}
+.Image {
+  img {
+    border-radius: 3px;
 
-.WrongQuestion {
-  background: pink;
-}
-
-.Question {
-  background: white;
+    margin-top: 32px;
+    margin-bottom: 8px;
+  }
 }

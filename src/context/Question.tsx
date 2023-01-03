@@ -4,9 +4,6 @@ import { addQuestion, getOneRandomQuestion } from '../api';
 import { IFilters } from '../interface/Filter';
 import { IAddQuestion, IQuestion, ISessionQuestion } from '../interface/Question';
 
-const areas = ['naturais', 'matematica', 'humanas', 'linguagens'];
-const years = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022]
-
 type QuestionContextProps = {
     children: ReactNode;
 };
@@ -17,7 +14,7 @@ interface IQuestionContext {
 
     setFilters: React.Dispatch<React.SetStateAction<IFilters>>
 
-    getRandomQuestion: () => Promise<void>;
+    getRandomQuestion: (noFilter: boolean) => Promise<void>;
     saveResult: (question: IAddQuestion) => Promise<void>;
 }
 
@@ -29,13 +26,13 @@ export const QuestionContextCmpnt = ({ children }: QuestionContextProps) => {
 
     const navigate = useNavigate()
 
-    const getRandomQuestion = async () => {
+    const getRandomQuestion = async (noFilter: boolean) => {
         try {
-            const { data } = await getOneRandomQuestion(filters)
-            console.log(data)
+            const { data } = await getOneRandomQuestion(noFilter ? { years: [], areas: [] } : filters)
+
             setQuestion(question)
 
-            navigate('/question/' + data.url)
+            navigate(`/question/random/${noFilter}/` + data.url)
         } catch (error) {
             console.error(error)
         }

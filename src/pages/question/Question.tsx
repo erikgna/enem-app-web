@@ -1,13 +1,11 @@
-import { useContext, useEffect, useState, createElement } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { QuestionContext } from '../../context/Question'
 import { useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query';
-import { getOne, getOneRandomQuestion } from '../../api';
+import { getOne } from '../../api';
 import { IQuestion } from '../../interface/Question';
 
-interface IQuestionPage {
-    result?: boolean;
-}
+import styles from './Question.module.scss'
 
 export const Question = () => {
     const { question, saveResult, getRandomQuestion } = useContext(QuestionContext)
@@ -23,7 +21,7 @@ export const Question = () => {
     if (!question) query = useQuery({
         queryKey: ['question'],
         refetchOnWindowFocus: false,
-        queryFn: () => getOne(`${url[0].replace('/question/', '')}-${url[1]}-${url[2]}`)
+        queryFn: () => getOne(`${url[0].split('/')[4]}-${url[1]}-${url[2]}`)
     })
 
     const questionTemp = query ? query.data?.data as IQuestion : question
@@ -43,7 +41,7 @@ export const Question = () => {
     }
 
     const nextPage = async () => {
-        await getRandomQuestion();
+        await getRandomQuestion(url[0].includes('true'));
 
         window.location.reload()
     }
@@ -56,12 +54,12 @@ export const Question = () => {
 
     return (
         <div className='flex flex-col px-2 dark:bg-gray-900 dark:text-white pt-8 min-h-screen pb-8'>
-            <h2 className='text-2xl font-bold' onClick={() => console.log(answer)}>{questionTemp?.name}</h2>
-            <div className='text-base mt-4 mb-8' dangerouslySetInnerHTML={{ __html: questionTemp?.description! }} />
+            <h2 className='text-2xl font-bold'>{questionTemp?.name}</h2>
+            <div className={`text-base mt-4 mb-8 ${styles.Image}`} dangerouslySetInnerHTML={{ __html: questionTemp?.description! }} />
 
             <p className='text-base mb-8'>{questionTemp?.ask}</p>
 
-            <ul className="flex flex-col">
+            <ul className='flex flex-col'>
                 {['a', 'b', 'c', 'd', 'e'].map((item) => {
                     type IQuestionKey = keyof typeof questionTemp
 
@@ -93,18 +91,20 @@ export const Question = () => {
                 <span className="font-medium">Por favor, selecione ao menos uma opção!</span>
             </div>}
 
-            <div className='flex align-center mt-4 pb-8'>
-                <button
-                    type="button"
-                    className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                    onClick={finalAnswer}
-                >Ver Resposta</button>
-                <button
-                    type="button"
-                    className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                    onClick={nextPage}
-                >Próxima</button>
-            </div>
+            {url.length < 4 &&
+                <div className='flex align-center mt-4 pb-8'>
+                    <button
+                        type="button"
+                        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                        onClick={finalAnswer}
+                    >Ver Resposta</button>
+                    <button
+                        type="button"
+                        className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                        onClick={nextPage}
+                    >Próxima</button>
+                </div>
+            }
         </div>
     )
 }
