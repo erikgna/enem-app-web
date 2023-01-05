@@ -1,73 +1,31 @@
-import { useContext, useEffect, useState } from 'react'
-import { QuestionContext } from '../../context/Question'
-import { useLocation } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query';
-import { getOne } from '../../api';
+import { useState } from 'react'
 import { IQuestion } from '../../interface/Question';
 
 import styles from './Question.module.scss'
 import { QueryLoading } from '../../components/QueryLoading/QueryLoading';
 import { QueryError } from '../../components/QueryError/QueryError';
+import { useQuestion } from '../../hooks/questionHooks';
 
 export const Question = () => {
-    const { question, saveResult, getRandomQuestion } = useContext(QuestionContext)
-    const location = useLocation()
-
-    const url = location.pathname.split('-')
+    const questionHook = useQuestion()
 
     const [choose, setChoose] = useState<string | undefined>(undefined)
-    const [answer, setAnswer] = useState<string | undefined>(undefined)
-    const [open, setOpen] = useState<boolean>(false)
 
-    let query;
-    if (!question) query = useQuery({
-        queryKey: ['question'],
-        refetchOnWindowFocus: false,
-        queryFn: () => getOne(`${url[0].split('/')[4]}-${url[1]}-${url[2]}`)
-    })
+    const questionTemp = questionHook.query ? questionHook.query.data?.data as IQuestion : questionHook.question
 
-    const questionTemp = query ? query.data?.data as IQuestion : question
-
-    const finalAnswer = async () => {
-        if (!choose) {
-            setOpen(true)
-            return
-        }
-
-        const rightAnswer = questionTemp?.rightAnswer?.toLowerCase()
-        setAnswer(rightAnswer)
-
-        if (questionTemp) {
-            await saveResult({ id: questionTemp?.id, correct: choose === questionTemp.rightAnswer })
-        }
-    }
-
-    const nextPage = async () => {
-        await getRandomQuestion(url[0].includes('true'));
-
-        window.location.reload()
-    }
-
-    useEffect(() => {
-        if (url.length === 4) {
-            setAnswer(url[3])
-        }
-    }, [])
-
-    if (!query || query.isError) {
+    if (!questionHook.query || questionHook.query.isError) {
         return <QueryError
             title='Erro'
             description='Ocorreu um erro ao requisitar a questão, por favor, tente novamente.'
-            func={nextPage}
+            func={questionHook.nextPage}
             linkMsg='Tentar novamente'
         />
     }
 
-    if (query.isLoading) {
+    if (questionHook.query.isLoading) {
         return <QueryLoading />
     }
 
-    //TODO: Enviar questoes do historico
     return (
         <div className='flex flex-col px-2 dark:bg-gray-900 dark:text-white pt-8 min-h-screen pb-8'>
             <h2 className='text-2xl font-bold'>{questionTemp?.name}</h2>
@@ -79,7 +37,7 @@ export const Question = () => {
                 {['a', 'b', 'c', 'd', 'e'].map((item) => {
                     type IQuestionKey = keyof typeof questionTemp
 
-                    if (answer === undefined) {
+                    if (questionHook.answer === undefined) {
                         return <li key={item} onClick={() => setChoose(item)} className='mb-4'>
                             <input type="radio" id={item} className="hidden peer" />
                             <label className={`${choose === item ? 'dark:text-blue-500 dark:border-blue-600 text-blue-600' : 'dark:hover:text-gray-300 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400 dark:border-gray-700'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
@@ -93,7 +51,7 @@ export const Question = () => {
 
                     return <li key={item} onClick={() => setChoose(item)} className='mb-4'>
                         <input type="radio" id={item} className="hidden peer" />
-                        <label className={`${answer === item ? 'dark:text-green-500 dark:border-green-600 text-green-600' : 'dark:text-red-500 dark:border-red-600 text-red-600'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
+                        <label className={`${questionHook.answer === item ? 'dark:text-green-500 dark:border-green-600 text-green-600' : 'dark:text-red-500 dark:border-red-600 text-red-600'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
                             <div className="block">
                                 <div className="w-full text-lg font-semibold">{item.toUpperCase()}</div>
                                 <div className="w-full">{questionTemp?.answers[item as IQuestionKey]}</div>
@@ -103,21 +61,21 @@ export const Question = () => {
                 })}
             </ul>
 
-            {open && <div className="p-4 mb-4 text-sm text-blue-700 bg-blue-100 rounded-lg dark:bg-blue-200 dark:text-blue-800" role="alert">
+            {questionHook.open && <div className="p-4 mb-4 text-sm text-blue-700 bg-blue-100 rounded-lg dark:bg-blue-200 dark:text-blue-800" role="alert">
                 <span className="font-medium">Por favor, selecione ao menos uma opção!</span>
             </div>}
 
-            {url.length < 4 &&
+            {questionHook.url.length < 4 &&
                 <div className='flex align-center mt-4 pb-8'>
                     <button
                         type="button"
                         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                        onClick={finalAnswer}
+                        onClick={() => questionHook.finalAnswer(questionTemp!, choose)}
                     >Ver Resposta</button>
                     <button
                         type="button"
                         className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                        onClick={nextPage}
+                        onClick={questionHook.nextPage}
                     >Próxima</button>
                 </div>
             }

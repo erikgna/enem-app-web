@@ -7,6 +7,9 @@ import emptyList from '../../images/empty_list.svg'
 import { QueryLoading } from '../../components/QueryLoading/QueryLoading';
 import { QueryError } from '../../components/QueryError/QueryError';
 
+import { IHistoryQuestion } from '../../interface/Question';
+import { PercentageCircle } from '../../components/PercentageCircle/PercentageCircle';
+
 export const History = () => {
     const navigate = useNavigate()
 
@@ -54,8 +57,56 @@ export const History = () => {
         )
     }
 
+    const questions = query.data?.data as IHistoryQuestion[]
+    const tempPercentage = { humanas: { correct: 0, wrong: 0 }, linguagens: { correct: 0, wrong: 0 }, matematica: { correct: 0, wrong: 0 }, natureza: { correct: 0, wrong: 0 } }
+
+    questions.forEach((item) => {
+        if (item.question.url.includes('humanas')) {
+            item.correct ? tempPercentage.humanas.correct++ : tempPercentage.humanas.wrong++
+        }
+        if (item.question.url.includes('linguagens')) {
+            item.correct ? tempPercentage.linguagens.correct++ : tempPercentage.linguagens.wrong++
+        }
+        if (item.question.url.includes('matematica')) {
+            item.correct ? tempPercentage.matematica.correct++ : tempPercentage.matematica.wrong++
+        }
+        if (item.question.url.includes('naturais')) {
+            item.correct ? tempPercentage.natureza.correct++ : tempPercentage.natureza.wrong++
+        }
+    })
+
+    const hundredPercentage = 100
+
+    const medLinguagens = Math.round((tempPercentage.linguagens.correct * hundredPercentage) / (tempPercentage.linguagens.correct + tempPercentage.linguagens.wrong))
+    const medHumanas = Math.round((tempPercentage.humanas.correct * hundredPercentage) / (tempPercentage.humanas.correct + tempPercentage.humanas.wrong))
+    const medNaturezas = Math.round((tempPercentage.natureza.correct * hundredPercentage) / (tempPercentage.natureza.correct + tempPercentage.natureza.wrong))
+    const medMatematicas = Math.round((tempPercentage.matematica.correct * hundredPercentage) / (tempPercentage.matematica.correct + tempPercentage.matematica.wrong))
+
     return (
-        <section className='flex flex-col px-2 dark:bg-gray-900 dark:text-white pt-16 min-h-screen'>
+        <section className='flex flex-col px-4 dark:bg-gray-900 dark:text-white pt-16 min-h-screen'>
+            <h2 className='text-2xl text-white bold'>Pontuação</h2>
+            <div className='flex pb-24 justify-center w-full flex-wrap'>
+                <div className='flex flex-wrap justify-center'>
+                    <div className='flex flex-col mt-8 w-80'>
+                        <h4 className='pb-8 text-center text-base '>Ciências Humanas e suas Tecnologias</h4>
+                        <PercentageCircle percentage={isNaN(medHumanas) ? 0 : medHumanas} />
+                    </div>
+                    <div className='flex flex-col mt-8 w-80'>
+                        <h4 className='pb-8 text-center text-base'>Ciências Naturais e suas Tecnologias</h4>
+                        <PercentageCircle percentage={isNaN(medNaturezas) ? 0 : medNaturezas} />
+                    </div>
+                </div>
+                <div className='flex flex-wrap justify-center'>
+                    <div className='flex flex-col mt-8 w-80'>
+                        <h4 className='pb-8 text-center text-base'>Linguagens, Códigos e suas Tecnologias</h4>
+                        <PercentageCircle percentage={isNaN(medLinguagens) ? 0 : medLinguagens} />
+                    </div>
+                    <div className='flex flex-col mt-8 w-80'>
+                        <h4 className='pb-8 text-center text-base'>Matemática e suas Tecnologias</h4>
+                        <PercentageCircle percentage={isNaN(medMatematicas) ? 0 : medMatematicas} />
+                    </div>
+                </div>
+            </div>
             <h2 className='text-2xl text-white bold mb-8'>Histórico de questões</h2>
             <ul>
                 {query.data?.data.map((item: any) => (
@@ -73,7 +124,7 @@ export const History = () => {
                     </li>
                 ))}
             </ul>
-            <button className="mt-2" onClick={async () => {
+            <button className="mt-2 mb-8" onClick={async () => {
                 await eraseHistory()
                 window.location.reload()
             }}>

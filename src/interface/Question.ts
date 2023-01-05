@@ -22,3 +22,12 @@ export interface IAddQuestion {
   id: string;
   correct: boolean;
 }
+
+export interface IHistoryQuestion {
+  question: {
+    url: string;
+    name: string;
+    rightAnswer: string;
+  };
+  correct: boolean;
+}

@@ -34,7 +34,7 @@ export const Home = () => {
     }
 
     return (
-        <div className='flex flex-col px-2 dark:bg-gray-900 dark:text-white pt-16 min-h-screen'>
+        <div className='flex flex-col px-4 dark:bg-gray-900 dark:text-white pt-16 min-h-screen'>
             <div className='flex flex-col pb-4'>
                 <h2 className='text-2xl font-bold'>Filtre as perguntas que você irá receber</h2>
                 <h4 className='text-lg font-semibold pt-8'>Selecione as áreas de conhecimento desejadas</h4>

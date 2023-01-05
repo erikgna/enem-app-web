@@ -28,7 +28,7 @@ export const Navbar = () => {
                             </li>
                         }
                         {cookies['token'] &&
-                            <li onClick={signOut} className='pl-3 pr-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'>
+                            <li onClick={signOut} className='cursor-pointer pl-3 pr-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'>
                                 Sair da conta
                             </li>
                         }
