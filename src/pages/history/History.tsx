@@ -9,9 +9,26 @@ import { QueryError } from '../../components/QueryError/QueryError';
 
 import { IHistoryQuestion } from '../../interface/Question';
 import { PercentageCircle } from '../../components/PercentageCircle/PercentageCircle';
+import { Button } from '../../components/Buttons/Button';
+import { useState } from 'react';
+import { ErrorAlert } from '../../components/ErrorAlert/ErrorAlert';
 
 export const History = () => {
     const navigate = useNavigate()
+
+    const [error, setError] = useState<string>('')
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+
+    const deleteHistory = async () => {
+        setIsLoading(true)
+        try {
+            await eraseHistory()
+            window.location.reload()
+        } catch (error) {
+            setError('Ocorreu um erro ao apagar o histórico')
+        }
+        setIsLoading(false)
+    }
 
     const query = useQuery({
         queryKey: ['questions'],
@@ -19,7 +36,7 @@ export const History = () => {
         queryFn: () => getHistory()
     })
 
-    if (query.isLoading) {
+    if (query.isLoading || isLoading) {
         return <QueryLoading />
     }
 
@@ -83,7 +100,7 @@ export const History = () => {
     const medMatematicas = Math.round((tempPercentage.matematica.correct * hundredPercentage) / (tempPercentage.matematica.correct + tempPercentage.matematica.wrong))
 
     return (
-        <section className='flex flex-col px-4 dark:bg-gray-900 dark:text-white pt-16 min-h-screen'>
+        <section className='flex pb-8 flex-col px-4 dark:bg-gray-900 dark:text-white pt-16 min-h-screen'>
             <h2 className='text-2xl text-white bold'>Pontuação</h2>
             <div className='flex pb-24 justify-center w-full flex-wrap'>
                 <div className='flex flex-wrap justify-center'>
@@ -108,7 +125,7 @@ export const History = () => {
                 </div>
             </div>
             <h2 className='text-2xl text-white bold mb-8'>Histórico de questões</h2>
-            <ul>
+            <ul className='mb-2'>
                 {query.data?.data.map((item: any) => (
                     <li
                         onClick={() => navigate(`/question/random/false/${item.question.url}-${item.question.rightAnswer}`)}
@@ -124,22 +141,8 @@ export const History = () => {
                     </li>
                 ))}
             </ul>
-            <button className="mt-2 mb-8" onClick={async () => {
-                await eraseHistory()
-                window.location.reload()
-            }}>
-                <p
-                    className="relative inline-block text-sm font-medium text-blue-500 group active:text-blue-500 focus:outline-none focus:ring"
-                >
-                    <span
-                        className="absolute inset-0 transition-transform translate-x-0.5 translate-y-0.5 bg-blue-500 group-hover:translate-y-0 group-hover:translate-x-0"
-                    ></span>
-
-                    <span className="relative block px-8 py-3 bg-[#1A2238] border border-current">
-                        Apagar histórico
-                    </span>
-                </p>
-            </button>
+            <Button text='Apagar histórico' func={deleteHistory} />
+            {error !== '' && <ErrorAlert feedback={error} func={() => setError('')} />}
         </section>
     )
 }

@@ -1,6 +1,8 @@
 import { useCookies } from 'react-cookie';
 import { Link, useNavigate } from 'react-router-dom';
 
+import icon from '../../images/icon.png'
+
 export const Navbar = () => {
     const [cookies, setCookies, removeCookies] = useCookies()
     const navigate = useNavigate()
@@ -14,7 +16,7 @@ export const Navbar = () => {
         <nav className='border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-900 w-full z-20 top-0 left-0 border-b'>
             <div className='container flex items-center justify-between mx-auto'>
                 <Link to="/" className='flex items-center'>
-                    <img src="https://flowbite.com/docs/images/logo.svg" className="mr-3" alt="Flowbite Logo" />
+                    <img src={icon} className="mr-3 w-8 h-8" alt="Flowbite Logo" />
                     <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Unsolved</span>
                 </Link>
                 <div className='items-center justify-between'>

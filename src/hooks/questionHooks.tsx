@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
-import { getOne } from "../api";
+import { getOne, postReport } from "../api";
 import { QuestionContext } from "../context/Question";
 import { IQuestion } from "../interface/Question";
 
@@ -43,6 +43,12 @@ export const useQuestion = () => {
         }
     }, [])
 
+    const sendReport = async (id: string, msg: string) => {
+        try {
+            await postReport({ id, msg })
+        } catch (_) { }
+    }
+
     return {
         question,
 
@@ -52,6 +58,7 @@ export const useQuestion = () => {
         url,
 
         finalAnswer,
-        nextPage
+        nextPage,
+        sendReport
     }
 }

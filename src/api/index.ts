@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { IFilters } from "../interface/Filter";
 import { IAddQuestion } from "../interface/Question";
+import { IReport } from "../interface/Report";
 import { ILogin, IRegister } from "../interface/User";
 
 const api: AxiosInstance = axios.create({
@@ -21,5 +22,7 @@ export const eraseHistory = () => api.delete("/users/erase-history");
 
 export const loginRoute = (body: ILogin) => api.post("/auth/login", body);
 export const registerRoute = (body: IRegister) => api.post("/users", body);
+
+export const postReport = (body: IReport) => api.post("/report", body);
 
 export default api;

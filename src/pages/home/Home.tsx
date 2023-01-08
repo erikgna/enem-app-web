@@ -1,4 +1,6 @@
 import { useContext, useState } from 'react'
+import { ErrorAlert } from '../../components/ErrorAlert/ErrorAlert'
+import { QueryLoading } from '../../components/QueryLoading/QueryLoading'
 
 import { QuestionContext } from '../../context/Question'
 
@@ -9,7 +11,7 @@ const areas = [{ name: 'Ciências Humanas e suas Tecnologias', cod: 'humanas' },
 
 export const Home = () => {
     const [open, setOpen] = useState<boolean>(false)
-    const { getRandomQuestion, setFilters, filters } = useContext(QuestionContext)
+    const { getRandomQuestion, setFilters, setFeedback, filters, isLoading, feedback } = useContext(QuestionContext)
 
     const addOrRemoveYear = (year: string) => {
         if (filters.years.includes(year)) {
@@ -33,6 +35,10 @@ export const Home = () => {
         localStorage.setItem('filters', JSON.stringify({ ...filters, areas: [...filters.areas, area] }))
     }
 
+    if (isLoading) {
+        return <QueryLoading />
+    }
+
     return (
         <div className='flex flex-col px-4 dark:bg-gray-900 dark:text-white pt-16 min-h-screen'>
             <div className='flex flex-col pb-4'>
@@ -46,7 +52,7 @@ export const Home = () => {
                         <input type="radio" id={item.name} className="hidden peer" />
                         <label className={`${filters.areas.includes(item.cod) ? 'dark:text-blue-500 dark:border-blue-600 text-blue-600' : 'dark:hover:text-gray-300 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400 dark:border-gray-700'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
                             <div className="block">
-                                <div className="w-full text-lg font-semibold">Primeira prova</div>
+                                <div className="w-full text-lg font-semibold">{(item.cod.includes('naturais') || item.cod.includes('matematica')) ? 'Segundo dia' : 'Primeiro dia'}</div>
                                 <div className="w-full">{item.name}</div>
                             </div>
                             <svg aria-hidden="true" className="ml-3 w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
@@ -57,7 +63,7 @@ export const Home = () => {
 
             <h4 className='text-lg font-semibold pt-8 pb-4'>Selecione os anos desejados</h4>
             <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 lg:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4">
-                {[2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022].map((year) => (
+                {[2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022].map((year) => (
                     <li key={year} className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
                         <div className="flex items-center pl-3">
                             <input
@@ -93,6 +99,7 @@ export const Home = () => {
                     onClick={() => getRandomQuestion(true)}
                 >Gerar Perguntas Aleatoriamente</button>
             </div>
-        </div >
+            {feedback !== '' && <ErrorAlert feedback={feedback} func={() => setFeedback('')} />}
+        </div>
     )
 }

@@ -11,7 +11,10 @@ type QuestionContextProps = {
 interface IQuestionContext {
     question: IQuestion | null;
     filters: IFilters;
+    feedback: string;
+    isLoading: boolean;
 
+    setFeedback: React.Dispatch<React.SetStateAction<string>>
     setFilters: React.Dispatch<React.SetStateAction<IFilters>>
 
     getRandomQuestion: (noFilter: boolean) => Promise<void>;
@@ -23,10 +26,13 @@ export const QuestionContext = createContext<IQuestionContext>(null!)
 export const QuestionContextCmpnt = ({ children }: QuestionContextProps) => {
     const [question, setQuestion] = useState<IQuestion | null>(null)
     const [filters, setFilters] = useState<IFilters>(JSON.parse(localStorage.getItem('filters') ?? JSON.stringify({ years: [], areas: [] })))
+    const [feedback, setFeedback] = useState<string>('')
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const navigate = useNavigate()
 
     const getRandomQuestion = async (noFilter: boolean) => {
+        setIsLoading(true)
         try {
             const { data } = await getOneRandomQuestion(noFilter ? { years: [], areas: [] } : filters)
 
@@ -34,18 +40,28 @@ export const QuestionContextCmpnt = ({ children }: QuestionContextProps) => {
 
             navigate(`/question/random/${noFilter}/` + data.url)
         } catch (error) {
-            console.error(error)
+            setFeedback('Ocorreu um erro ao requisitar a questão, por favor, tente novamente.')
         }
+        setIsLoading(false)
     }
 
     const saveResult = async (body: IAddQuestion) => {
-        const { status } = await addQuestion(body)
+        setIsLoading(true)
+        try {
+            await addQuestion(body)
+        } catch (error) {
+            setFeedback('Ocorreu um erro ao salvar a questão no seu histórico.')
+        }
+        setIsLoading(false)
     }
 
     const initState: IQuestionContext = {
         getRandomQuestion,
         saveResult,
+        feedback,
+        isLoading,
 
+        setFeedback,
         setFilters,
 
         filters,
