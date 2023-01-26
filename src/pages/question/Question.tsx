@@ -5,21 +5,29 @@ import styles from './Question.module.scss'
 import { QueryLoading } from '../../components/QueryLoading/QueryLoading';
 import { QueryError } from '../../components/QueryError/QueryError';
 import { useQuestion } from '../../hooks/questionHooks';
-import { Button } from '../../components/Buttons/Button';
 import { ErrorAlert } from '../../components/ErrorAlert/ErrorAlert';
 import { QuestionContext } from '../../context/Question';
+import { NotFound } from '../notFound/NotFound';
 
 export const Question = () => {
     const questionHook = useQuestion()
-    const { feedback, isLoading, setFeedback } = useContext(QuestionContext)
+    const { feedback, setFeedback } = useContext(QuestionContext)
 
     const [choose, setChoose] = useState<string | undefined>(undefined)
     const [modal, setModal] = useState<boolean>(false)
     const [modalMsg, setModalMsg] = useState<string>('')
 
-    const questionTemp = questionHook.query ? questionHook.query.data?.data as IQuestion : questionHook.question
+    if (location.pathname.includes("undefined")) {
+        return <NotFound />
+    }
 
-    if (!questionHook.query || questionHook.query.isError) {
+    const questionTemp = questionHook.question
+
+    if (questionHook.isLoading) {
+        return <QueryLoading />
+    }
+
+    if (questionHook.question === null) {
         return <QueryError
             title='Erro'
             description='Ocorreu um erro ao requisitar a questão, por favor, tente novamente.'
@@ -28,20 +36,31 @@ export const Question = () => {
         />
     }
 
-    if (questionHook.query.isLoading || isLoading) {
-        return <QueryLoading />
-    }
-
     return (
         <div className='flex flex-col px-4 dark:bg-gray-900 dark:text-white pt-8 min-h-screen pb-8'>
-            <div className='flex items-center justify-between mb-8'>
-                <h2 className='text-2xl font-bold'>{questionTemp?.name}</h2>
-                <Button text='Reportar problema' func={() => setModal(true)} />
+            <div className='flex-col items-center justify-between mb-8'>
+                <div className='mb-8'>
+                    {feedback !== '' && <ErrorAlert feedback={feedback} func={() => setFeedback('')} />}
+                </div>
+                <h2 className='text-2xl font-bold mb-4'>{questionTemp?.name}</h2>
+                <button onClick={() => setModal(true)}>
+                    <p
+                        className="relative inline-block text-sm font-medium text-blue-500 group active:text-blue-500 focus:outline-none focus:ring"
+                    >
+                        <span
+                            className="absolute inset-0 transition-transform translate-x-0.5 translate-y-0.5 bg-blue-500 group-hover:translate-y-0 group-hover:translate-x-0"
+                        ></span>
+
+                        <span className="relative block px-4 py-2 bg-[#1A2238] border border-current">
+                            Reportar problema
+                        </span>
+                    </p>
+                </button>
             </div>
 
             <div className={`text-base mt-4 mb-8 ${styles.Image}`} dangerouslySetInnerHTML={{ __html: questionTemp?.description.replaceAll('<br />', '<div></div>')! }} />
 
-            <p className='text-base mb-8'>{questionTemp?.ask}</p>
+            <p className={`text-base mb-8 ${styles.Image}`} dangerouslySetInnerHTML={{ __html: questionTemp?.ask.replaceAll('<br />', '<div></div>')! }} />
 
             <ul className='flex flex-col'>
                 {['a', 'b', 'c', 'd', 'e'].map((item) => {
@@ -53,7 +72,7 @@ export const Question = () => {
                             <label className={`${choose === item ? 'dark:text-blue-500 dark:border-blue-600 text-blue-600' : 'dark:hover:text-gray-300 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400 dark:border-gray-700'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
                                 <div className="block">
                                     <div className="w-full text-lg font-semibold">{item.toUpperCase()}</div>
-                                    <div className="w-full">{questionTemp?.answers[item as IQuestionKey]}</div>
+                                    <div className={`w-full ${styles.Image}`} dangerouslySetInnerHTML={{ __html: (questionTemp?.answers[item as IQuestionKey] as unknown as string).replaceAll('<br />', '<div></div>')! }} />
                                 </div>
                             </label>
                         </li>
@@ -64,7 +83,7 @@ export const Question = () => {
                         <label className={`${questionHook.answer === item ? 'dark:text-green-500 dark:border-green-600 text-green-600' : 'dark:text-red-500 dark:border-red-600 text-red-600'} dark:bg-gray-800 inline-flex justify-between items-center p-5 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer`}>
                             <div className="block">
                                 <div className="w-full text-lg font-semibold">{item.toUpperCase()}</div>
-                                <div className="w-full">{questionTemp?.answers[item as IQuestionKey]}</div>
+                                <div className={`w-full ${styles.Image}`} dangerouslySetInnerHTML={{ __html: (questionTemp?.answers[item as IQuestionKey] as unknown as string).replaceAll('<br />', '<div></div>')! }} />
                             </div>
                         </label>
                     </li>
@@ -85,11 +104,15 @@ export const Question = () => {
                     <button
                         type="button"
                         className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                        onClick={questionHook.nextPage}
+                        onClick={() => {
+                            setFeedback("")
+                            setChoose(undefined)
+                            questionHook.nextPage()
+                        }}
                     >Próxima</button>
                 </div>
             }
-            {modal && <div id="popup-modal" tabIndex={-1} className="fixed bg-[rgba(0,0,0,.65)] top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full flex items-center justify-center">
+            {modal && <div id="popup-modal" tabIndex={-1} className="fixed bg-[rgba(0,0,0,.65)] top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal h-full flex items-center justify-center">
                 <div className="relative w-full h-full max-w-md md:h-auto">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                         <button onClick={() => setModal(false)} type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-hide="popup-modal">
@@ -125,7 +148,6 @@ export const Question = () => {
                     </div>
                 </div>
             </div>}
-            {feedback !== '' && <ErrorAlert feedback={feedback} func={() => setFeedback('')} />}
         </div>
     )
 }

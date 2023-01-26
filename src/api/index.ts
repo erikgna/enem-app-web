@@ -4,9 +4,15 @@ import { IAddQuestion } from "../interface/Question";
 import { IReport } from "../interface/Report";
 import { ILogin, IRegister } from "../interface/User";
 
+const token = document.cookie
+  .split(";")
+  .find((item) => item.includes("unsolved-token="))
+  ?.replace("unsolved-token=", "");
+
 const api: AxiosInstance = axios.create({
   baseURL: "http://localhost:8080/api/v1",
-  headers: { authorization: `Bearer ${document.cookie.replace("token=", "")}` },
+  // baseURL: "https://enem-popvpucinq-vp.a.run.app/api/v1",
+  headers: { authorization: `Bearer ${token}` },
 });
 
 export const getOne = (url: string) => api.get(`/questions/${url}`);

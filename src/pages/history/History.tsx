@@ -23,7 +23,7 @@ export const History = () => {
         setIsLoading(true)
         try {
             await eraseHistory()
-            window.location.reload()
+            query.refetch()
         } catch (error) {
             setError('Ocorreu um erro ao apagar o histórico')
         }

@@ -1,21 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
-import { getOne, postReport } from "../api";
+import { postReport } from "../api";
 import { QuestionContext } from "../context/Question";
 import { IQuestion } from "../interface/Question";
 
 export const useQuestion = () => {
-    const { question, saveResult, getRandomQuestion } = useContext(QuestionContext)
+    const { saveResult, getRandomQuestion, isLoading } = useContext(QuestionContext)
 
     const [open, setOpen] = useState<boolean>(false)
     const [answer, setAnswer] = useState<string | undefined>(undefined)
+    const [question, setQuestion] = useState<IQuestion | null>(null)
 
     const url = location.pathname.split('-')
 
     const nextPage = async () => {
-        await getRandomQuestion(url[0].includes('true'));
+        const data = await getRandomQuestion(url[0].includes('true'));
 
-        window.location.reload()
+        setQuestion(data as IQuestion)
+        setAnswer(undefined)
+        setOpen(false)
     }
 
     const finalAnswer = async (savedQuestion: IQuestion, choose: string | undefined) => {
@@ -27,20 +29,22 @@ export const useQuestion = () => {
         const rightAnswer = savedQuestion.rightAnswer?.toLowerCase()
         setAnswer(rightAnswer)
 
-        await saveResult({ id: savedQuestion.id, correct: choose === savedQuestion.rightAnswer })
-    }
+        if (!document.cookie.includes("unsolved-token")) {
+            return
+        }
 
-    let query;
-    if (!question) query = useQuery({
-        queryKey: ['question'],
-        refetchOnWindowFocus: false,
-        queryFn: () => getOne(`${url[0].split('/')[4]}-${url[1]}-${url[2]}`)
-    })
+        saveResult({ id: savedQuestion.id, correct: choose === savedQuestion.rightAnswer })
+    }
 
     useEffect(() => {
         if (url.length === 4) {
             setAnswer(url[3])
         }
+        const questionFromStorage = sessionStorage.getItem("question")
+        if (questionFromStorage) {
+            setQuestion(JSON.parse(questionFromStorage))
+        }
+
     }, [])
 
     const sendReport = async (id: string, msg: string) => {
@@ -54,8 +58,8 @@ export const useQuestion = () => {
 
         open,
         answer,
-        query,
         url,
+        isLoading,
 
         finalAnswer,
         nextPage,

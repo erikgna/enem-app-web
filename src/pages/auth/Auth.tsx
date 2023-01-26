@@ -19,6 +19,7 @@ export const Auth = () => {
 
     const login = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setFeedback("")
 
         if (creds.email.length === 0 || creds.password.length === 0) {
             return;
@@ -27,7 +28,7 @@ export const Auth = () => {
         try {
             const { data } = await loginRoute(creds)
 
-            setCookies('token', data['token'], { maxAge: 86400 })
+            setCookies('unsolved-token', data['token'], { maxAge: 86400 })
 
             navigate('/')
             window.location.reload()
@@ -39,19 +40,20 @@ export const Auth = () => {
 
     const register = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setFeedback("")
 
         if (creds.email.length === 0 || creds.password.length === 0) {
             return;
         }
 
         try {
-            const { data } = await registerRoute(creds as IRegister)
+            await registerRoute(creds as IRegister)
 
+            setCreds(defaultCreds)
             navigate('/login')
         } catch (error) {
             setFeedback('Ocorreu um erro com seu registro, tente novamente.')
         }
-        setCreds(defaultCreds)
     }
 
     return (
@@ -69,7 +71,8 @@ export const Auth = () => {
                         <input
                             onChange={(e) => setCreds({ ...creds, fullName: e.target.value })}
                             name='fullName'
-                            title='fullName'
+                            title='Nome completo'
+                            value={(creds as IRegister).fullName}
                             type="text"
                             placeholder='Seu nome completo'
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -84,7 +87,8 @@ export const Auth = () => {
                         <input
                             onChange={(e) => setCreds({ ...creds, email: e.target.value })}
                             name='email'
-                            title='email'
+                            title='Email'
+                            value={(creds as IRegister).email}
                             type="email"
                             placeholder='Seu email'
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -99,7 +103,8 @@ export const Auth = () => {
                         <input
                             onChange={(e) => setCreds({ ...creds, password: e.target.value })}
                             name='password'
-                            title='password'
+                            title='Senha'
+                            value={(creds as IRegister).password}
                             type="password"
                             placeholder='Sua senha'
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -114,7 +119,8 @@ export const Auth = () => {
                         <input
                             onChange={(e) => setCreds({ ...creds, confirmPassword: e.target.value })}
                             name='confirmPassword'
-                            title='confirmPassword'
+                            title='Confirmar senha'
+                            value={(creds as IRegister).confirmPassword}
                             type="password"
                             placeholder='Confirme sua senha'
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

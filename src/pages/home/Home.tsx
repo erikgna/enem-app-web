@@ -17,6 +17,7 @@ export const Home = () => {
         if (filters.years.includes(year)) {
             const tempYears = filters.years.filter((val) => val !== year)
             setFilters({ areas: filters.areas, years: tempYears })
+            localStorage.setItem('filters', JSON.stringify({ ...filters, years: tempYears }))
             return;
         }
         setFilters({ ...filters, years: [...filters.years, year] })
@@ -28,6 +29,7 @@ export const Home = () => {
         if (filters.areas.includes(area)) {
             const tempAreas = filters.areas.filter((val) => val !== area)
             setFilters({ years: filters.years, areas: tempAreas })
+            localStorage.setItem('filters', JSON.stringify({ ...filters, areas: tempAreas }))
             return;
         }
         setFilters({ ...filters, areas: [...filters.areas, area] })
@@ -64,14 +66,14 @@ export const Home = () => {
             <h4 className='text-lg font-semibold pt-8 pb-4'>Selecione os anos desejados</h4>
             <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 lg:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4">
                 {[2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022].map((year) => (
-                    <li key={year} className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                    <li key={year} className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600" onClick={() => addOrRemoveYear(year.toString())}>
                         <div className="flex items-center pl-3">
                             <input
+                                readOnly={true}
                                 checked={filters.years.includes(year.toString())}
                                 id={year.toString()}
                                 type="radio"
                                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-                                onChange={() => addOrRemoveYear(year.toString())}
                             />
                             <label className="py-3 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300">{year}</label>
                         </div>
