@@ -23,7 +23,7 @@ export const Question = () => {
 
     const questionTemp = questionHook.question
 
-    if (questionHook.isLoading) {
+    if (questionHook.isLoading || questionHook.question === undefined) {
         return <QueryLoading />
     }
 

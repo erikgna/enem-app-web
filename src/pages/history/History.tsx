@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { eraseHistory, getHistory } from '../../api';
+import { eraseHistory, getHistory, getOneRandomQuestion } from '../../api';
 import { Link } from 'react-router-dom';
 
 import emptyList from '../../images/empty_list.svg'
@@ -12,9 +12,11 @@ import { PercentageCircle } from '../../components/PercentageCircle/PercentageCi
 import { Button } from '../../components/Buttons/Button';
 import { useState } from 'react';
 import { ErrorAlert } from '../../components/ErrorAlert/ErrorAlert';
+import { useQuestion } from '../../hooks/questionHooks';
 
 export const History = () => {
     const navigate = useNavigate()
+    const questionHook = useQuestion()
 
     const [error, setError] = useState<string>('')
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -128,7 +130,10 @@ export const History = () => {
             <ul className='mb-2'>
                 {query.data?.data.map((item: any) => (
                     <li
-                        onClick={() => navigate(`/question/random/false/${item.question.url}-${item.question.rightAnswer}`)}
+                        onClick={async () => {
+                            await questionHook.getQuestion(item.question.url)
+                            navigate(`/question/random/false/${item.question.url}-${item.question.rightAnswer}`)
+                        }}
                         className={`${item.correct ? 'p-4 border-green-500 border rounded-lg cursor-pointer mb-4' : 'p-4 border-red-500 border rounded-lg cursor-pointer mb-4'}`}
                         key={item.question.name}>
                         <div className="flex items-center space-x-4">

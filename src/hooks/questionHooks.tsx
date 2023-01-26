@@ -1,21 +1,21 @@
 import { useContext, useEffect, useState } from "react";
-import { postReport } from "../api";
+import { getOne, postReport } from "../api";
 import { QuestionContext } from "../context/Question";
 import { IQuestion } from "../interface/Question";
 
 export const useQuestion = () => {
-    const { saveResult, getRandomQuestion, isLoading } = useContext(QuestionContext)
+    const { saveResult, getRandomQuestion, getOneQuestion, isLoading } = useContext(QuestionContext)
 
     const [open, setOpen] = useState<boolean>(false)
     const [answer, setAnswer] = useState<string | undefined>(undefined)
-    const [question, setQuestion] = useState<IQuestion | null>(null)
+    const [question, setQuestion] = useState<IQuestion | null | undefined>(undefined)
 
     const url = location.pathname.split('-')
 
     const nextPage = async () => {
         const data = await getRandomQuestion(url[0].includes('true'));
 
-        setQuestion(data as IQuestion)
+        setQuestion(data)
         setAnswer(undefined)
         setOpen(false)
     }
@@ -34,6 +34,11 @@ export const useQuestion = () => {
         }
 
         saveResult({ id: savedQuestion.id, correct: choose === savedQuestion.rightAnswer })
+    }
+
+    const getQuestion = async (url: string) => {
+        const data = await getOneQuestion(url)
+        setQuestion(data)
     }
 
     useEffect(() => {
@@ -62,6 +67,7 @@ export const useQuestion = () => {
         isLoading,
 
         finalAnswer,
+        getQuestion,
         nextPage,
         sendReport
     }

@@ -1,6 +1,6 @@
 import { useState, createContext, ReactNode } from 'react'
 import { useNavigate } from 'react-router';
-import { addQuestion, getOneRandomQuestion } from '../api';
+import { addQuestion, getOne, getOneRandomQuestion } from '../api';
 import { IFilters } from '../interface/Filter';
 import { IAddQuestion, IQuestion } from '../interface/Question';
 
@@ -16,7 +16,8 @@ interface IQuestionContext {
     setFeedback: React.Dispatch<React.SetStateAction<string>>
     setFilters: React.Dispatch<React.SetStateAction<IFilters>>
 
-    getRandomQuestion: (noFilter: boolean) => Promise<IQuestion | void>;
+    getRandomQuestion: (noFilter: boolean) => Promise<IQuestion | null>;
+    getOneQuestion: (url: string) => Promise<IQuestion | null>;
     saveResult: (question: IAddQuestion) => Promise<void>;
 }
 
@@ -43,9 +44,9 @@ export const QuestionContextCmpnt = ({ children }: QuestionContextProps) => {
             return data
         } catch (error) {
             setFeedback('Ocorreu um erro ao requisitar a questão, por favor, tente novamente.')
+            setIsLoading(false)
+            return null
         }
-
-        setIsLoading(false)
     }
 
     const saveResult = async (body: IAddQuestion) => {
@@ -58,8 +59,29 @@ export const QuestionContextCmpnt = ({ children }: QuestionContextProps) => {
         }
     }
 
+    const getOneQuestion = async (url: string) => {
+        setIsLoading(true)
+        setFeedback("")
+
+        try {
+            const { data } = await getOne(url)
+
+            sessionStorage.removeItem("question")
+            sessionStorage.setItem("question", JSON.stringify(data))
+
+            setIsLoading(false)
+
+            return data
+        } catch (error) {
+            setFeedback('Ocorreu um erro ao requisitar a questão, por favor, tente novamente.')
+            setIsLoading(false)
+            return null
+        }
+    }
+
     const initState: IQuestionContext = {
         getRandomQuestion,
+        getOneQuestion,
         saveResult,
         feedback,
         isLoading,
