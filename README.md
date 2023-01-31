@@ -1,6 +1,6 @@
 # Enem Web
 
-<img src="exemplo-image.png" alt="Tela inicial">
+<img src="tela-inicial.png" alt="Tela inicial">
 
 > Esse projeto busca trazer todas as questões do Enem a um clique de você. Com histórico de respostas e filtros.
 
