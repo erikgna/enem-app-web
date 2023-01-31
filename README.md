@@ -9,9 +9,9 @@
 Antes de começar, verifique se você atendeu aos seguintes requisitos:
 * Você instalou a versão mais recente de `<Node>`
 
-## 🚀 Instalando <enem-app-web>
+## 🚀 Instalando Unsolved
 
-Para instalar o <enem-app-web>, siga estas etapas:
+Para instalar o Unsolved, siga estas etapas:
 
 Na pasta raíz:
 ```
@@ -19,12 +19,12 @@ npm i
 npm run dev
 ```
 
-## ☕ Usando <enem-app-web>
+## ☕ Usando Unsolved
 
-Para usar <enem-app-web>, siga estas etapas:
+Para usar Unsolved, siga estas etapas:
 
 ```
 Acesse o link: http://localhost:5173
 ```
 
-[⬆ Voltar ao topo](#enem-app-web)<br>
+[⬆ Voltar ao topo](#Unsolved)<br>
