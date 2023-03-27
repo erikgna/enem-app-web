@@ -1,0 +1,27 @@
+version: "3.7"
+
+networks:
+  web:
+    external: true
+
+services:
+  enem_web:
+    image: node:alpine
+    container_name: enem_web
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.blog.rule=Host(`blog.erikna.com`)
+      - traefik.http.routers.blog.entrypoints=web, websecure
+      - traefik.http.routers.blog.tls=true
+      - traefik.http.routers.blog.tls.certresolver=production
+    networks:
+      - web
+    entrypoint: /bin/sh
+    ports:
+      - 8000:8000
+    working_dir: /srv/app
+    volumes:
+      - type: bind
+        source: ./
+        target: /srv/app
+    tty: true
