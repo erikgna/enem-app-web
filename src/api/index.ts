@@ -11,7 +11,7 @@ const token = document.cookie
 
 const api: AxiosInstance = axios.create({
   // baseURL: "http://localhost:8080/api/v1",
-  baseURL: "https://enem-popvpucinq-vp.a.run.app/api/v1",
+  baseURL: "https://enemapi.erikna.com/api/v1",
   headers: { authorization: `Bearer ${token}` },
 });
 
