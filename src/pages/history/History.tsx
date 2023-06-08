@@ -132,7 +132,7 @@ export const History = () => {
                     <li
                         onClick={async () => {
                             await questionHook.getQuestion(item.question.url)
-                            navigate(`/question/random/false/${item.question.url}-${item.question.rightAnswer}`)
+                            navigate(`/question/random/false/${item.question.url}-${item.question.rightanswer}`)
                         }}
                         className={`${item.correct ? 'p-4 border-green-500 border rounded-lg cursor-pointer mb-4' : 'p-4 border-red-500 border rounded-lg cursor-pointer mb-4'}`}
                         key={item.question.name}>

@@ -11,7 +11,7 @@ export interface IQuestion {
     d: string;
     e: string;
   };
-  rightAnswer?: string;
+  rightanswer?: string;
 }
 
 export interface ISessionQuestion {
@@ -27,7 +27,7 @@ export interface IHistoryQuestion {
   question: {
     url: string;
     name: string;
-    rightAnswer: string;
+    rightanswer: string;
   };
   correct: boolean;
 }

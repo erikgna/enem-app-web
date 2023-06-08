@@ -26,14 +26,14 @@ export const useQuestion = () => {
             return
         }
 
-        const rightAnswer = savedQuestion.rightAnswer?.toLowerCase()
+        const rightAnswer = savedQuestion.rightanswer?.toLowerCase()
         setAnswer(rightAnswer)
 
         if (!document.cookie.includes("unsolved-token")) {
             return
         }
 
-        saveResult({ id: savedQuestion.id, correct: choose === savedQuestion.rightAnswer })
+        saveResult({ id: savedQuestion.id, correct: choose === savedQuestion.rightanswer })
     }
 
     const getQuestion = async (url: string) => {

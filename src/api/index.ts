@@ -10,7 +10,6 @@ const token = document.cookie
   ?.replace("unsolved-token=", "");
 
 const api: AxiosInstance = axios.create({
-  // baseURL: "http://localhost:8080/api/v1",
   baseURL: "https://enemapi.erikna.com/api/v1",
   headers: { authorization: `Bearer ${token}` },
 });
